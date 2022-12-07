@@ -22,8 +22,29 @@ class TreeController extends Controller
             $tree .= '</li>';
         }
         $tree .= '<ul>';
-        return view('welcome', compact('tree','entries'));
+        return view('welcome', compact('tree','parents','entries'));
     }
+
+    public function ajax_view()
+    {
+        $entries = TreeEntry::with(['details:entry_id,name'])->get();
+        $parents = TreeEntry::where('parent_entry_id', 0)->with(['branches', 'details:entry_id,name'])->get();
+        return view('with-ajax', compact('parents','entries'));
+    }
+
+    public function ajax($id){
+        $nodes = TreeEntry::where('parent_entry_id', $id)->with(['branches', 'details:entry_id,name'])->get();
+        $tree = '<ul class="nested active">';
+        
+        foreach ($nodes as $e) 
+            $tree .= '<li><span class="caret" data-id="'.$e->entry_id.'">' . $e->details->name . '</span></li>';
+        
+        return response()->json([
+            'tree' => $tree,
+        ]);    
+    }
+
+
 
     public function branch($b)
     {

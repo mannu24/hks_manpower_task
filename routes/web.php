@@ -14,5 +14,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [\App\Http\Controllers\TreeController::class, 'index']);
+Route::get('/with-ajax', [\App\Http\Controllers\TreeController::class, 'ajax_view']);
 Route::post('/entry/add', [\App\Http\Controllers\TreeController::class, 'create']);
+
+Route::get('/fetch-branch/{id}', [\App\Http\Controllers\TreeController::class, 'ajax']);
+
+
 

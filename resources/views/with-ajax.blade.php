@@ -77,7 +77,7 @@
                 <a class="nav-link" href="/">Complete Tree</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/with-ajax">With Ajax Load</a>
+                <a class="nav-link active" href="/with-ajax">With Ajax Load</a>
             </li>
 
         </ul>
@@ -127,7 +127,13 @@
                 </div>
                 <div class="card-body">
                     <div id="tree">
-                        {!! $tree !!}
+                        <ul id="myUL">
+                            @foreach($parents as $p)
+                            <li>
+                                <span class="caret" data-id="{{ $p->entry_id }}">{{ $p->details->name }}</span>
+                            </li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -143,18 +149,29 @@
             }
         });
 
-        var toggler = document.getElementsByClassName("caret");
-        var i;
+        $(document).on('click','.caret',function(){
+            if($(this).hasClass('caret-down')){
+                $(this).removeClass('caret-down');
+                $(this).parent().children('ul').empty();
+            }
+            else{
 
-        for (i = 0; i < toggler.length; i++) {
-            toggler[i].addEventListener("click", function() {
-                if(this.parentElement.querySelector(".nested")){
+            let span = $(this);
+            var id = $(this).data('id');
+            console.log(id);
+            $.ajax({
+                url: '/fetch-branch/'+id,
+                type: 'GET',
+                success: function(data) {
+                    console.log(span);
+                    span.parent().append(data.tree)
+                    span.addClass('caret-down')
 
-                    this.parentElement.querySelector(".nested").classList.toggle("active");
                 }
-                this.classList.toggle("caret-down");
             });
         }
+
+        });
 
         $('#submit-form').submit(function(e) {
             e.preventDefault();
